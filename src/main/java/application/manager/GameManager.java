@@ -1,6 +1,9 @@
 package application.manager;
 
 import application.model.*;
+import application.model.messages.PlayerLoggedIn;
+import application.model.messages.PlayerLoggedOut;
+import application.model.messages.PlayerMove;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
@@ -13,7 +16,7 @@ public class GameManager {
 
   private final Gson gson;
   private final AtomicInteger playerCounter;
-  private final Map<Session, Player> sessionPlayerMap;
+  private final Map<Session, PlayerLoggedIn> sessionPlayerMap;
   private final BoardGame boardGame;
 
   public GameManager() {
@@ -23,8 +26,8 @@ public class GameManager {
     this.boardGame = new BoardGame();
   }
 
-  public void handleIncomingMessage(Session session, String msgJson) {
-    Message<?> msg = this.gson.fromJson(msgJson, Message.class);
+  public void handleIncomingMessage(Session session, String jsonMsg) {
+    Message<?> msg = this.gson.fromJson(jsonMsg, Message.class);
     switch (msg.getMsgType()) {
       case PlayerMove:
         handlePlayerMove((PlayerMove) msg.getData(), session);
@@ -33,14 +36,14 @@ public class GameManager {
   }
 
   public void handleLoginPlayer(Session session) {
-    Player player = new Player(this.playerCounter.incrementAndGet());
-    this.sessionPlayerMap.put(session, player);
-    sendMessage(session, new Message<Player>(MsgType.PlayerLogin, player));
+    PlayerLoggedIn PlayerLoggedIn = new PlayerLoggedIn(this.playerCounter.incrementAndGet());
+    this.sessionPlayerMap.put(session, PlayerLoggedIn);
+    sendMessage(session, new Message<PlayerLoggedIn>(MsgType.PlayerLogin, PlayerLoggedIn));
   }
 
   public void handleLogoutPlayer(Session session) {
-    Player loggedOutPlayer = this.sessionPlayerMap.remove(session);
-    Message<PlayerLoggedOut> playerLoggedOutMessage = new Message<>(MsgType.PlayerLoggedOut, new PlayerLoggedOut(loggedOutPlayer));
+    PlayerLoggedIn loggedOutPlayerLoggedIn = this.sessionPlayerMap.remove(session);
+    Message<PlayerLoggedOut> playerLoggedOutMessage = new Message<>(MsgType.PlayerLoggedOut, new PlayerLoggedOut(loggedOutPlayerLoggedIn));
     broadcastMessage(playerLoggedOutMessage);
   }
 

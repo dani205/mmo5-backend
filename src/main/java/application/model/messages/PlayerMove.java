@@ -1,29 +1,24 @@
-package application.model;
+package application.model.messages;
 
+import application.model.Position;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 public class PlayerMove {
   private final int playerId;
-  private final int posX;
-  private final int posY;
+  private final Position position;
 
-  public PlayerMove(int playerId, int posX, int posY) {
+  public PlayerMove(int playerId, Position position) {
     this.playerId = playerId;
-    this.posX = posX;
-    this.posY = posY;
+    this.position = position;
   }
 
   public int getPlayerId() {
     return playerId;
   }
 
-  public int getPosX() {
-    return posX;
-  }
-
-  public int getPosY() {
-    return posY;
+  public Position getPosition() {
+    return position;
   }
 
   @Override
@@ -32,21 +27,19 @@ public class PlayerMove {
     if (o == null || getClass() != o.getClass()) return false;
     PlayerMove that = (PlayerMove) o;
     return playerId == that.playerId &&
-            posX == that.posX &&
-            posY == that.posY;
+            Objects.equal(position, that.position);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(playerId, posX, posY);
+    return Objects.hashCode(playerId, position);
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
             .add("playerId", playerId)
-            .add("posX", posX)
-            .add("posY", posY)
+            .add("position", position)
             .toString();
   }
 }
